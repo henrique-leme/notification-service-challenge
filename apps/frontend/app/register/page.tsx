@@ -63,7 +63,6 @@ export default function RegistrationPage() {
         password: formData.password,
       });
 
-      // Open the modal upon successful registration
       setOpenModal(true);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -86,7 +85,6 @@ export default function RegistrationPage() {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    // Optionally, redirect to the login page
     router.push("/login");
   };
 
