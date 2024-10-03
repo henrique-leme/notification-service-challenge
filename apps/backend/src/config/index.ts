@@ -15,17 +15,15 @@ const envSchema = z.object({
   AWS_REGION: z.string({
     required_error: "AWS_REGION is required",
   }),
-  BASE_URL: z.string().url({
-    message: "BASE_URL must be a valid URL",
-  }),
+  BASE_URL: z.string(),
   JWT_SECRET: z.string({
     required_error: "JWT_SECRET is required",
   }),
-  EMAIL_FROM: z.string().email("EMAIL_FROM must be a valid email address"),
+  EMAIL_FROM: z.string(),
   NEWS_API_KEY: z.string({
     required_error: "NEWS_API_KEY is required",
   }),
-  FRONTEND_URL: z.string().url("FRONTEND_URL must be a valid URL"),
+  FRONTEND_URL: z.string(),
 });
 
 const validateEnv = () => {
