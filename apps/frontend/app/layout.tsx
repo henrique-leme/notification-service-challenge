@@ -1,5 +1,5 @@
 import React from "react";
-import ClientLayout from "./clientLayout"; // Adjust the path as needed
+import ClientLayout from "./clientLayout";
 
 export default function RootLayout({
   children,

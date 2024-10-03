@@ -38,7 +38,7 @@ import { z } from "zod";
 
 interface Notification {
   _id: string;
-  searchQuery: string | string[]; // Adjusted to accept string or array
+  searchQuery: string | string[];
   relevancyScore: number;
   frequency: string;
   receivers: string[];
@@ -88,7 +88,6 @@ export default function NotificationTable({
       setError("");
       try {
         const data = await getNotifications(token);
-        // Normalize searchQuery to be an array
         const normalizedData = data.map((notification: Notification) => ({
           ...notification,
           searchQuery: Array.isArray(notification.searchQuery)
@@ -154,7 +153,6 @@ export default function NotificationTable({
   const handleEditSave = async () => {
     if (!currentNotification) return;
 
-    // Validate the data
     try {
       const validatedData = notificationSchema.parse(currentNotification);
       setEditErrors({});
