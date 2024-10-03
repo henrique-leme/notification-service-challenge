@@ -5,8 +5,12 @@ import routes from "./routes";
 
 const app = express();
 
+var corsOptions = {
+  origin: "*",
+};
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet());
 
 app.use("/api", routes);
