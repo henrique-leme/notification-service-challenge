@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const envSchema = z.object({
-  MONGO_URI: z.string().url("MONGO_URI must be a valid URL"),
+  MONGO_URI: z.string(),
   PORT: z.string().regex(/^\d+$/, "PORT must be a number"),
   AWS_ACCESS_KEY_ID: z.string({
     required_error: "AWS_ACCESS_KEY_ID is required",
