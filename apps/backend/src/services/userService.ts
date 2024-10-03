@@ -3,16 +3,16 @@ import User from "../models/userModel";
 import { env } from "../server";
 import { generateToken } from "../utils/generateToken";
 
-export const verifyEmail = async (token: string) => {
+export const verifyEmail = async (token: string): Promise<string> => {
   try {
     const decoded: any = jwt.verify(token, env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) {
-      throw new Error("Usuário não encontrado.");
+      throw new Error("User not found.");
     }
 
     if (user.isVerified) {
-      throw new Error("Usuário já está verificado.");
+      throw new Error("User is already verified.");
     }
 
     user.isVerified = true;
@@ -22,11 +22,13 @@ export const verifyEmail = async (token: string) => {
     return authToken;
   } catch (error) {
     if (error instanceof Error && error.name === "TokenExpiredError") {
-      throw new Error("Token expirado. Solicite um novo email de verificação.");
+      throw new Error(
+        "Token expired. Please request a new verification email."
+      );
     }
     if (error instanceof Error && error.name === "JsonWebTokenError") {
-      throw new Error("Token inválido.");
+      throw new Error("Invalid token.");
     }
-    throw new Error("Erro na verificação do token.");
+    throw new Error("Error verifying the token.");
   }
 };

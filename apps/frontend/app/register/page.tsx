@@ -9,31 +9,85 @@ import {
   Alert,
   Paper,
   Container,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { registerUser } from "../../api/auth";
 
-export default function RegisterPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+export default function RegistrationPage() {
   const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [openModal, setOpenModal] = useState(false);
+
+  const schema = z
+    .object({
+      firstName: z.string({ required_error: "First name is required" }),
+      lastName: z.string().optional(),
+      email: z.string().email("Invalid email address"),
+      password: z
+        .string()
+        .min(6, "Password must be at least 6 characters long"),
+      confirmPassword: z.string().min(6, "Please confirm your password"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem");
-      return;
-    }
 
     try {
-      await registerUser(name, email, password);
-      router.push("/login");
+      schema.parse(formData);
+      setErrors({});
+
+      await registerUser({
+        name: formData.firstName,
+        surname: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // Open the modal upon successful registration
+      setOpenModal(true);
     } catch (err) {
-      setError((err as Error).message);
+      if (err instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        err.errors.forEach((error) => {
+          if (error.path && error.path[0]) {
+            fieldErrors[error.path[0] as string] = error.message;
+          }
+        });
+        setErrors(fieldErrors);
+      } else {
+        setErrors({ general: "Error registering user" });
+      }
     }
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    // Optionally, redirect to the login page
+    router.push("/login");
   };
 
   return (
@@ -41,9 +95,9 @@ export default function RegisterPage() {
       maxWidth="sm"
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        flexDirection: "column",
         minHeight: "100vh",
+        justifyContent: "center",
       }}
     >
       <Paper
@@ -53,55 +107,90 @@ export default function RegisterPage() {
           borderRadius: "8px",
           width: "100%",
           maxWidth: 400,
+          position: "relative",
         }}
       >
+        <IconButton
+          onClick={handleBack}
+          sx={{ position: "absolute", top: 8, left: 8 }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
         <Typography
           variant="h5"
           component="h1"
           align="center"
           gutterBottom
-          sx={{ color: "#333", fontWeight: "bold" }}
+          sx={{ color: "#333", fontWeight: "bold", mt: 2 }}
         >
-          Registrar
+          Register
         </Typography>
-        {error && (
+        {errors.general && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {errors.general}
           </Alert>
         )}
         <Box component="form" onSubmit={handleRegister} sx={{ mt: 2 }}>
           <TextField
             fullWidth
-            label="Nome"
+            label="First Name"
             variant="outlined"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            sx={{ marginBottom: "1.5rem" }}
+            value={formData.firstName}
+            onChange={(e) =>
+              setFormData({ ...formData, firstName: e.target.value })
+            }
+            error={!!errors.firstName}
+            helperText={errors.firstName}
+            sx={{ marginBottom: "1rem" }}
+          />
+          <TextField
+            fullWidth
+            label="Last Name"
+            variant="outlined"
+            value={formData.lastName}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
+            error={!!errors.lastName}
+            helperText={errors.lastName}
+            sx={{ marginBottom: "1rem" }}
           />
           <TextField
             fullWidth
             label="Email"
             variant="outlined"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            sx={{ marginBottom: "1.5rem" }}
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+            error={!!errors.email}
+            helperText={errors.email}
+            sx={{ marginBottom: "1rem" }}
           />
           <TextField
             fullWidth
-            label="Senha"
+            label="Password"
             type="password"
             variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{ marginBottom: "1.5rem" }}
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            error={!!errors.password}
+            helperText={errors.password}
+            sx={{ marginBottom: "1rem" }}
           />
           <TextField
             fullWidth
-            label="Confirmar Senha"
+            label="Confirm Password"
             type="password"
             variant="outlined"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={formData.confirmPassword}
+            onChange={(e) =>
+              setFormData({ ...formData, confirmPassword: e.target.value })
+            }
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword}
             sx={{ marginBottom: "1.5rem" }}
           />
           <Button
@@ -118,10 +207,26 @@ export default function RegisterPage() {
               textTransform: "none",
             }}
           >
-            Registrar
+            Register
           </Button>
         </Box>
       </Paper>
+
+      {/* Modal */}
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>Registration Successful</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Thank you for registering! Please check your email to confirm your
+            account.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

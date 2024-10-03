@@ -3,6 +3,7 @@ import {
   createNotification,
   getNotifications,
   deleteNotification,
+  editNotification,
 } from "../services/notificationService";
 import mongoose from "mongoose";
 
@@ -80,6 +81,34 @@ export const removeNotification = async (
   try {
     await deleteNotification(userId, notificationId);
     res.status(200).json({ message: "Notificação removida com sucesso." });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateNotification = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: "Usuário não autenticado" });
+    return;
+  }
+
+  const userId = (req.user as { _id: mongoose.Types.ObjectId })._id.toString();
+  const { notificationId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const updatedNotification = await editNotification(
+      userId,
+      notificationId,
+      updateData
+    );
+    res.status(200).json({
+      message: "Notificação atualizada com sucesso.",
+      notification: updatedNotification,
+    });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

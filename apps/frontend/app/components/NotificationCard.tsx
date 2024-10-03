@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { z } from "zod";
-import { createNotification } from "../../api/notifications"; // Adjust the import path as needed
+import { createNotification } from "../../api/notifications";
 
 interface NotificationCardProps {
   open: boolean;
@@ -82,41 +82,32 @@ export default function NotificationCard({
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
-    // Prepare data for validation
     const dataToValidate = {
       ...newNotification,
       relevancyScore: Number(newNotification.relevancyScore),
     };
 
-    // Adjust schema conditionally based on frequency
     const schema =
       newNotification.frequency === "Weekly"
         ? notificationSchema
         : notificationSchema.omit({ days: true });
 
     try {
-      // Validate using Zod
       const validatedData = schema.parse(dataToValidate);
 
-      // Remove 'days' from data if frequency is not 'Weekly'
       if (validatedData.frequency !== "Weekly" && "days" in validatedData) {
         delete (validatedData as typeof validatedData & { days?: string[] })
           .days;
       }
 
-      // Clear errors if validation passes
       setErrors({});
 
-      // Set loading state
       setLoading(true);
 
-      // Call the API to create the notification
       await createNotification(token, validatedData);
 
-      // Reset loading state
       setLoading(false);
 
-      // Close the dialog and reset the form
       handleClose();
       setNewNotification({
         receivers: [],
@@ -130,7 +121,6 @@ export default function NotificationCard({
       onSuccess();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Map Zod errors to form errors
         const fieldErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
           if (err.path[0]) {
@@ -139,14 +129,12 @@ export default function NotificationCard({
         });
         setErrors(fieldErrors);
       } else {
-        // Handle API errors
         setLoading(false);
         setErrors({ apiError: (error as Error).message });
       }
     }
   };
 
-  // Days of the week options
   const daysOfWeek = [
     "Monday",
     "Tuesday",
@@ -157,14 +145,7 @@ export default function NotificationCard({
     "Sunday",
   ];
 
-  // Timezones (simplified list)
-  const timezones = [
-    "UTC",
-    "America/New_York",
-    "Europe/London",
-    "Asia/Tokyo",
-    // Add more as needed
-  ];
+  const timezones = ["UTC", "America/New_York", "Europe/London", "Asia/Tokyo"];
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>

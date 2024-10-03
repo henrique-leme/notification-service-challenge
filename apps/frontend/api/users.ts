@@ -16,7 +16,7 @@ export const sendVerificationEmail = async (email: string, userId: string) => {
 
 export const sendPasswordRecoveryEmail = async (email: string) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/recovery-password`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/forgot-password`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

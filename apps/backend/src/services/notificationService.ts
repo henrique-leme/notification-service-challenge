@@ -53,7 +53,7 @@ ${candidateName}`;
 
 export const getNotifications = async (userId: string) => {
   const notifications = await NotificationList.find({ creator: userId });
-  if (!notifications.length) throw new Error("Nenhuma notificação encontrada.");
+  if (!notifications.length) throw new Error("No notifications found.");
 
   return notifications;
 };
@@ -63,10 +63,10 @@ export const deleteNotification = async (
   notificationId: string
 ) => {
   const notification = await NotificationList.findById(notificationId);
-  if (!notification) throw new Error("Notificação não encontrada.");
+  if (!notification) throw new Error("Notification not found.");
 
   if (notification.creator.toString() !== userId)
-    throw new Error("Ação não autorizada.");
+    throw new Error("Action not authorized.");
 
   await NotificationList.findByIdAndDelete(notificationId);
 };
@@ -85,10 +85,10 @@ export const editNotification = async (
   }
 ) => {
   const notification = await NotificationList.findById(notificationId);
-  if (!notification) throw new Error("Notificação não encontrada.");
+  if (!notification) throw new Error("Notification not found.");
 
   if (notification.creator.toString() !== userId)
-    throw new Error("Ação não autorizada.");
+    throw new Error("Action not authorized.");
 
   Object.assign(notification, updateData);
   await notification.save();

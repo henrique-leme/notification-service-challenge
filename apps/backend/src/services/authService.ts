@@ -1,17 +1,22 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
-import { sendVerificationEmail } from "./emailService";
+import {
+  sendVerificationEmail,
+  sendPasswordRecoveryEmail,
+} from "./emailService";
 import { env } from "../server";
 import { hashPassword, comparePassword } from "../utils/hash";
+import crypto from "crypto";
 
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email });
-  if (!user) throw new Error("Email ou senha incorretos.");
+  if (!user) throw new Error("Incorrect email or password.");
 
   const isMatch = await comparePassword(password, user.password);
-  if (!isMatch) throw new Error("Email ou senha incorretos.");
+  if (!isMatch) throw new Error("Incorrect email or password.");
 
-  if (!user.isVerified) throw new Error("Verifique seu email para continuar.");
+  if (!user.isVerified)
+    throw new Error("Please verify your email to continue.");
 
   return jwt.sign({ id: user._id.toString() }, env.JWT_SECRET || "", {
     expiresIn: "30d",
@@ -25,7 +30,7 @@ export const registerUser = async (
   password: string
 ) => {
   const userExists = await User.findOne({ email });
-  if (userExists) throw new Error("Email já registrado.");
+  if (userExists) throw new Error("Email is already registered.");
 
   const hashedPassword = await hashPassword(password);
 
@@ -39,4 +44,41 @@ export const registerUser = async (
   await newUser.save();
 
   await sendVerificationEmail(newUser.email, newUser._id.toString());
+};
+
+export const sendPasswordResetEmail = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    return;
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  user.passwordResetToken = hashedToken;
+  user.passwordResetExpires = new Date(Date.now() + 3600000);
+
+  await user.save({ validateBeforeSave: false });
+
+  await sendPasswordRecoveryEmail(user.email, token);
+};
+
+export const resetUserPassword = async (token: string, newPassword: string) => {
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  console.log("passo2");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new Error("Invalid or expired token.");
+  }
+
+  user.password = await hashPassword(newPassword);
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
 };

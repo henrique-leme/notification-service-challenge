@@ -9,10 +9,15 @@ import {
   Alert,
   Paper,
   Container,
+  IconButton,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useRouter } from "next/navigation";
 import { sendPasswordRecoveryEmail } from "../../api/users";
 
 export default function RecoveryPasswordPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -20,17 +25,21 @@ export default function RecoveryPasswordPage() {
   const handleRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setError("Preencha o campo de email");
+      setError("Please fill in the email field");
       return;
     }
 
     try {
       await sendPasswordRecoveryEmail(email);
-      setSuccess("Email de recuperação enviado com sucesso");
+      setSuccess("Recovery email sent successfully");
       setError("");
     } catch (err) {
       setError((err as Error).message);
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -38,9 +47,9 @@ export default function RecoveryPasswordPage() {
       maxWidth="sm"
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        flexDirection: "column",
         minHeight: "100vh",
+        justifyContent: "center",
       }}
     >
       <Paper
@@ -50,16 +59,23 @@ export default function RecoveryPasswordPage() {
           borderRadius: "8px",
           width: "100%",
           maxWidth: 400,
+          position: "relative",
         }}
       >
+        <IconButton
+          onClick={handleBack}
+          sx={{ position: "absolute", top: 8, left: 8 }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
         <Typography
           variant="h5"
           component="h1"
           align="center"
           gutterBottom
-          sx={{ color: "#333", fontWeight: "bold" }}
+          sx={{ color: "#333", fontWeight: "bold", mt: 2 }}
         >
-          Recuperar Senha
+          Recover Password
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -94,7 +110,7 @@ export default function RecoveryPasswordPage() {
               textTransform: "none",
             }}
           >
-            Recuperar Senha
+            Recover Password
           </Button>
         </Box>
       </Paper>

@@ -18,18 +18,12 @@ export default function DashboardPage() {
   const [loadingToken, setLoadingToken] = useState(true);
   const [refresh, setRefresh] = useState(false);
 
-  // Retrieve token on client-side
   useEffect(() => {
     setLoadingToken(true);
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
     setLoadingToken(false);
   }, []);
-
-  const handleEdit = (id: string) => {
-    console.log(`Editing notification with id: ${id}`);
-    // Implement editing functionality here
-  };
 
   const handleOpenCreateDialog = () => {
     setOpenCreateDialog(true);
@@ -39,7 +33,6 @@ export default function DashboardPage() {
     setOpenCreateDialog(false);
   };
 
-  // Trigger refresh after creating a notification
   const handleRefresh = () => {
     setRefresh((prev) => !prev);
   };
@@ -67,17 +60,17 @@ export default function DashboardPage() {
               }}
             >
               <Typography variant="h5" component="h1">
-                Suas Notificações
+                Notifications
               </Typography>
               <Button variant="contained" onClick={handleOpenCreateDialog}>
-                Criar Notificação
+                Create Notification
               </Button>
             </Box>
 
             <NotificationTable
               token={token}
-              handleEdit={handleEdit}
               refresh={refresh}
+              onRefresh={handleRefresh}
             />
 
             <NotificationCard

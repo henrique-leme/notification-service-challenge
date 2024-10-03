@@ -17,18 +17,18 @@ export const loginUser = async (email: string, password: string) => {
   return data;
 };
 
-export const registerUser = async (
-  name: string,
-  email: string,
-  password: string,
-  surname?: string
-) => {
+export const registerUser = async (userData: {
+  name: string;
+  surname?: string;
+  email: string;
+  password: string;
+}) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, surname }),
+      body: JSON.stringify(userData),
     }
   );
 

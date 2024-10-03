@@ -11,10 +11,10 @@ export const sendVerificationEmail = async (email: string, userId: string) => {
     Source: env.EMAIL_FROM,
     Destination: { ToAddresses: [email] },
     Message: {
-      Subject: { Data: "Confirme seu Email" },
+      Subject: { Data: "Confirm Your Email" },
       Body: {
         Text: {
-          Data: `Clique no link para verificar seu email: ${verificationLink}`,
+          Data: `Click the link to verify your email: ${verificationLink}`,
         },
       },
     },
@@ -32,7 +32,7 @@ export const sendNotificationEmail = async (
     Source: env.EMAIL_FROM,
     Destination: { ToAddresses: receivers },
     Message: {
-      Subject: { Data: "Sua Notificação Personalizada" },
+      Subject: { Data: "Your Personalized Notification" },
       Body: { Text: { Data: content } },
     },
   };
@@ -45,16 +45,16 @@ export const sendPasswordRecoveryEmail = async (
   email: string,
   resetToken: string
 ) => {
-  const resetLink = `${env.BASE_URL}/reset-password?token=${resetToken}`;
+  const resetLink = `${env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   const params = {
     Source: env.EMAIL_FROM,
     Destination: { ToAddresses: [email] },
     Message: {
-      Subject: { Data: "Recupere sua Senha" },
+      Subject: { Data: "Recover Your Password" },
       Body: {
         Text: {
-          Data: `Clique no link para redefinir sua senha: ${resetLink}`,
+          Data: `Click the link to reset your password: ${resetLink}`,
         },
       },
     },

@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface INotificationList extends Document {
   creator: mongoose.Types.ObjectId;
   receivers: string[];
-  searchQuery: string;
+  searchQuery: string[]; // Updated to an array of strings
   relevancyScore: number;
   frequency: string;
   days: string[];
@@ -25,7 +25,7 @@ const notificationListSchema: Schema = new Schema(
       required: true,
     },
     receivers: [{ type: String, required: true }],
-    searchQuery: { type: String, required: true },
+    searchQuery: [{ type: String, required: true }], // Changed to an array
     relevancyScore: { type: Number, required: true, min: 1, max: 5 },
     frequency: { type: String, required: true },
     days: [{ type: String, required: true }],

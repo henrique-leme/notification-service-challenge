@@ -141,7 +141,7 @@ export default function LoginPage() {
             variant="body2"
             sx={{ color: "#333", mt: 1 }}
           >
-            Forgot Username / Password?
+            Forgot Password? <strong>Reset it</strong>
           </Link>
         </Box>
       </Paper>

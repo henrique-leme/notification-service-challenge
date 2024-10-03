@@ -7,6 +7,8 @@ export interface IUser extends Document {
   password: string;
   isVerified: boolean;
   notificationList: mongoose.Types.ObjectId[];
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
 }
 
 export interface IUserModel extends IUser {
@@ -25,6 +27,8 @@ const userSchema: Schema = new Schema(
     notificationList: [
       { type: mongoose.Schema.Types.ObjectId, ref: "NotificationList" },
     ],
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
   },
   { timestamps: true }
 );
