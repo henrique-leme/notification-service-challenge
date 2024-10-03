@@ -1,99 +1,98 @@
-import Image from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import {
+  Box,
+  Paper,
+  Typography,
+  Container,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import NotificationTable from "./components/NotificationTable";
+import NotificationCard from "./components/NotificationCard";
+
+export default function DashboardPage() {
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [loadingToken, setLoadingToken] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+
+  // Retrieve token on client-side
+  useEffect(() => {
+    setLoadingToken(true);
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+    setLoadingToken(false);
+  }, []);
+
+  const handleEdit = (id: string) => {
+    console.log(`Editing notification with id: ${id}`);
+    // Implement editing functionality here
+  };
+
+  const handleOpenCreateDialog = () => {
+    setOpenCreateDialog(true);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setOpenCreateDialog(false);
+  };
+
+  // Trigger refresh after creating a notification
+  const handleRefresh = () => {
+    setRefresh((prev) => !prev);
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Container maxWidth="md" sx={{ marginTop: 4 }}>
+      <Paper elevation={3} sx={{ padding: 3 }}>
+        {loadingToken ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="200px"
+          >
+            <CircularProgress />
+          </Box>
+        ) : token ? (
+          <>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h5" component="h1">
+                Suas Notificações
+              </Typography>
+              <Button variant="contained" onClick={handleOpenCreateDialog}>
+                Criar Notificação
+              </Button>
+            </Box>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <NotificationTable
+              token={token}
+              handleEdit={handleEdit}
+              refresh={refresh}
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file-text.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+            <NotificationCard
+              open={openCreateDialog}
+              handleClose={handleCloseCreateDialog}
+              token={token}
+              onSuccess={handleRefresh}
+            />
+          </>
+        ) : (
+          <Typography color="error">
+            Token não encontrado. Por favor, faça login novamente.
+          </Typography>
+        )}
+      </Paper>
+    </Container>
   );
 }
