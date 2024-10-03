@@ -1,12 +1,14 @@
-import AWS from "aws-sdk";
-import validateEnv from "./index";
+import { SESClient } from "@aws-sdk/client-ses";
+import { config } from "./index";
 
-const env = validateEnv();
-
-AWS.config.update({
-  accessKeyId: env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-  region: env.AWS_REGION,
+export const sesClient = new SESClient({
+  region: config.AWS_REGION,
+  credentials: {
+    accessKeyId: config.AWS_ACCESS_KEY_ID,
+    secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
-export default AWS;
+console.log(`AWS SES Client configured for region: ${config.AWS_REGION}`);
+
+export default sesClient;

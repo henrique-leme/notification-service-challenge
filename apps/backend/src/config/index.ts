@@ -1,56 +1,29 @@
+import * as dotenv from "dotenv";
 import { z } from "zod";
-import dotenv from "dotenv";
 
 dotenv.config();
 
 const envSchema = z.object({
-  MONGO_URI: z.string(),
-  PORT: z.string().regex(/^\d+$/, "PORT must be a number"),
-  AWS_ACCESS_KEY_ID: z.string({
-    required_error: "AWS_ACCESS_KEY_ID is required",
-  }),
-  AWS_SECRET_ACCESS_KEY: z.string({
-    required_error: "AWS_SECRET_ACCESS_KEY is required",
-  }),
-  AWS_REGION: z.string({
-    required_error: "AWS_REGION is required",
-  }),
-  BASE_URL: z.string(),
-  JWT_SECRET: z.string({
-    required_error: "JWT_SECRET is required",
-  }),
-  EMAIL_FROM: z.string(),
-  NEWS_API_KEY: z.string({
-    required_error: "NEWS_API_KEY is required",
-  }),
-  FRONTEND_URL: z.string(),
+  MONGO_URI: z.string().default("mongodb://localhost:27017"),
+  PORT: z.string().regex(/^\d+$/, "PORT must be a number").default("5000"),
+  AWS_ACCESS_KEY_ID: z.string().default(""),
+  AWS_SECRET_ACCESS_KEY: z.string().default(""),
+  AWS_REGION: z.string().default("us-east-1"),
+  BASE_URL: z.string().default("http://localhost:5000"),
+  JWT_SECRET: z.string().default("secret"),
+  EMAIL_FROM: z.string().default("no-reply@example.com"),
+  NEWS_API_KEY: z.string().default(""),
+  FRONTEND_URL: z.string().default("http://localhost:3000"),
 });
 
-const validateEnv = () => {
-  const envVars = {
-    MONGO_URI: process.env.MONGO_URI || "",
-    PORT: process.env.PORT || "5000",
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || "",
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || "",
-    AWS_REGION: process.env.AWS_REGION || "",
-    BASE_URL: process.env.BASE_URL || "",
-    JWT_SECRET: process.env.JWT_SECRET || "",
-    EMAIL_FROM: process.env.EMAIL_FROM || "",
-    NEWS_API_KEY: process.env.NEWS_API_KEY || "",
-    FRONTEND_URL: process.env.FRONTEND_URL || "",
-  };
+const envVars = envSchema.safeParse(process.env);
 
-  const result = envSchema.safeParse(envVars);
+if (!envVars.success) {
+  console.error(
+    "Environment variables validation error:",
+    envVars.error.format()
+  );
+  process.exit(1);
+}
 
-  if (!result.success) {
-    console.error(
-      "Environment variables validation error:",
-      result.error.format()
-    );
-    process.exit(1);
-  }
-
-  return result.data;
-};
-
-export default validateEnv;
+export const config = envVars.data;

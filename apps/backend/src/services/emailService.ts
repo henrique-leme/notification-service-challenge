@@ -1,14 +1,15 @@
 import { SendEmailCommand } from "@aws-sdk/client-ses";
-import { env, sesClient } from "../server";
+import { config } from "../config/index";
 import { generateToken } from "../utils/generateToken";
+import sesClient from "../config/awsConfig";
 
 export const sendVerificationEmail = async (email: string, userId: string) => {
   const token = generateToken(userId);
 
-  const verificationLink = `${env.BASE_URL}/api/users/verify-email/${token}`;
+  const verificationLink = `${config.BASE_URL}/api/users/verify-email/${token}`;
 
   const params = {
-    Source: env.EMAIL_FROM,
+    Source: config.EMAIL_FROM,
     Destination: { ToAddresses: [email] },
     Message: {
       Subject: { Data: "Confirm Your Email" },
@@ -29,7 +30,7 @@ export const sendNotificationEmail = async (
   content: string
 ) => {
   const params = {
-    Source: env.EMAIL_FROM,
+    Source: config.EMAIL_FROM,
     Destination: { ToAddresses: receivers },
     Message: {
       Subject: { Data: "Your Personalized Notification" },
@@ -45,10 +46,10 @@ export const sendPasswordRecoveryEmail = async (
   email: string,
   resetToken: string
 ) => {
-  const resetLink = `${env.FRONTEND_URL}/reset-password/${resetToken}`;
+  const resetLink = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
 
   const params = {
-    Source: env.EMAIL_FROM,
+    Source: config.EMAIL_FROM,
     Destination: { ToAddresses: [email] },
     Message: {
       Subject: { Data: "Recover Your Password" },

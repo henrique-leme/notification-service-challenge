@@ -4,9 +4,9 @@ import {
   sendVerificationEmail,
   sendPasswordRecoveryEmail,
 } from "./emailService";
-import { env } from "../server";
 import { hashPassword, comparePassword } from "../utils/hash";
 import crypto from "crypto";
+import { config } from "../config/index";
 
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email });
@@ -18,7 +18,7 @@ export const loginUser = async (email: string, password: string) => {
   if (!user.isVerified)
     throw new Error("Please verify your email to continue.");
 
-  return jwt.sign({ id: user._id.toString() }, env.JWT_SECRET || "", {
+  return jwt.sign({ id: user._id.toString() }, config.JWT_SECRET || "", {
     expiresIn: "30d",
   });
 };

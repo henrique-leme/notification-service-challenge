@@ -1,17 +1,17 @@
-import { SESClient } from "@aws-sdk/client-ses";
-import app from "./app";
-import connectDB from "./config/db";
-import validateEnv from "./config/index";
+import { mongo } from "./config/db";
+import { config } from "./config/index";
+import { setupApp } from "./app";
 
-const env = validateEnv();
-const sesClient = new SESClient({ region: env.AWS_REGION });
+async function startApp() {
+  await mongo();
 
-const PORT = env.PORT;
+  setupApp().then((app) => {
+    const PORT = config.PORT;
 
-connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port: ${PORT}`);
+    });
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-export { sesClient, env };
+startApp();

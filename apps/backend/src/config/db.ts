@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
-import validateEnv from "./index";
+import { config } from "./index";
 
-const connectDB = async () => {
+export const mongo = async () => {
   try {
-    const env = validateEnv();
-    const conn = await mongoose.connect(env.MONGO_URI);
+    const conn = await mongoose.connect(config.MONGO_URI);
+
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error: ${error}`);
+    console.error(`Error connecting to MongoDB: ${error}`);
     process.exit(1);
   }
 };
-
-export default connectDB;

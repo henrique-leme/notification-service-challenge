@@ -1,7 +1,7 @@
 import axios from "axios";
-import { env } from "../server";
+import { config } from "../config/index";
 
-const apiKey = env.NEWS_API_KEY;
+const apiKey = config.NEWS_API_KEY;
 const newsApiUrl = "https://newsapi.org/v2/everything";
 
 export const fetchNews = async (searchQuery: string) => {

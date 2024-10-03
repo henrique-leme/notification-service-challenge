@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
-import { env } from "../server";
+import { config } from "../config/index";
 
 export const protect = async (
   req: Request,
@@ -17,7 +17,7 @@ export const protect = async (
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token, env.JWT_SECRET || "") as {
+      const decoded = jwt.verify(token, config.JWT_SECRET || "") as {
         id: string;
       };
 

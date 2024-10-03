@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
-import { env } from "../server";
+import { config } from "../config/index";
 import { generateToken } from "../utils/generateToken";
 
 export const verifyEmail = async (token: string): Promise<string> => {
   try {
-    const decoded: any = jwt.verify(token, env.JWT_SECRET);
+    const decoded: any = jwt.verify(token, config.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) {
       throw new Error("User not found.");
