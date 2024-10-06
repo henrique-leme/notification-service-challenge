@@ -54,7 +54,7 @@ export default function NotificationTable({
   const [page, setPage] = useState(1);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>(""); // General error state
+  const [error, setError] = useState<string>("");
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     id: string | null;
@@ -346,10 +346,10 @@ export default function NotificationTable({
               variant="contained"
               sx={{
                 textTransform: "none",
-                backgroundColor: "#FF0000", // Cor de fundo vermelha
-                color: "#FFFFFF", // Cor do texto branca
+                backgroundColor: "#FF0000",
+                color: "#FFFFFF",
                 "&:hover": {
-                  backgroundColor: "#CC0000", // Cor mais escura ao passar o mouse
+                  backgroundColor: "#CC0000",
                 },
               }}
             >

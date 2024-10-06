@@ -44,7 +44,7 @@ export default function RecoveryPasswordPage() {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push("/login");
   };
 
   return (

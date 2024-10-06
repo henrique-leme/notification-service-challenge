@@ -80,7 +80,7 @@ export default function RegistrationPage() {
   };
 
   const handleBack = () => {
-    router.back();
+    router.push("/login");
   };
 
   const handleCloseModal = () => {

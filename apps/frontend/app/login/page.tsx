@@ -24,7 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [openModal, setOpenModal] = useState(false); // Estado para o modal de conta não verificada
+  const [openModal, setOpenModal] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -35,7 +35,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       if (err.message === "Please verify your email to continue.") {
-        setOpenModal(true); // Abre o modal
+        setOpenModal(true);
       } else {
         setError(err.message);
       }
