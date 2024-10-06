@@ -57,9 +57,11 @@ export const getNotifications = async (token: string) => {
   );
 
   const data = await response.json();
+
   if (!response.ok) {
     throw new Error(data.message || "Failed to fetch notifications");
   }
+
   return data;
 };
 

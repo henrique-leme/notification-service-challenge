@@ -26,6 +26,7 @@ import {
   FormHelperText,
   Chip,
   Autocomplete,
+  Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -58,7 +59,7 @@ export default function NotificationTable({
   const [page, setPage] = useState(1);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>(""); // General error state
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     id: string | null;
@@ -78,7 +79,10 @@ export default function NotificationTable({
     searchQuery: z
       .array(z.string().nonempty("Search query cannot be empty"))
       .nonempty("Please enter at least one search query"),
-    relevancyScore: z.number().min(1).max(5),
+    relevancyScore: z
+      .number()
+      .min(1)
+      .max(5, "Relevancy score must be between 1 and 5"),
     frequency: z.enum(["Daily", "Weekly", "Monthly"]),
   });
 
@@ -95,9 +99,12 @@ export default function NotificationTable({
             : [notification.searchQuery],
         }));
         setNotifications(normalizedData);
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-        setError("Failed to fetch notifications.");
+      } catch (err: any) {
+        if (err.message) {
+          setError(err.message);
+        } else {
+          setError("Failed to fetch notifications.");
+        }
       } finally {
         setLoading(false);
       }
@@ -200,7 +207,8 @@ export default function NotificationTable({
             alignItems="center"
             minHeight="200px"
           >
-            <Typography color="error">{error}</Typography>
+            <Alert severity="error">{error}</Alert>{" "}
+            {/* Display general error */}
           </Box>
         ) : notifications.length === 0 ? (
           <Box

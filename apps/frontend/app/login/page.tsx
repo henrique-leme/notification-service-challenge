@@ -16,32 +16,44 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { loginUser } from "../../api/auth";
+import AccountNotVerifiedModal from "../components/AccountNotVerifiedModal";
+import { resendVerificationEmail } from "../../api/users";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [openModal, setOpenModal] = useState(false); // Estado para o modal de conta não verificada
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const data = await loginUser(email, password);
-
       localStorage.setItem("token", data.token);
       router.push("/");
     } catch (err: any) {
-      if (err instanceof Error) {
-        setError(err.message);
+      if (err.message === "Please verify your email to continue.") {
+        setOpenModal(true); // Abre o modal
       } else {
-        setError("An unknown error occurred");
+        setError(err.message);
       }
     }
   };
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await resendVerificationEmail(email);
+      setOpenModal(false);
+      alert("Verification email has been resent.");
+    } catch (err) {
+      alert("Failed to resend verification email.");
+    }
   };
 
   return (
@@ -146,6 +158,12 @@ export default function LoginPage() {
           </Link>
         </Box>
       </Paper>
+
+      <AccountNotVerifiedModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onResendVerification={handleResendVerification}
+      />
     </Container>
   );
 }
