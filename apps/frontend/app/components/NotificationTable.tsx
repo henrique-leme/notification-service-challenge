@@ -249,6 +249,22 @@ export default function NotificationTable({
                       </TableCell>
                       <TableCell align="left">
                         {notification.frequency}
+                        {notification.frequency === "Weekly" &&
+                          notification.days && (
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="body2" color="textSecondary">
+                                Selected Days:
+                              </Typography>
+                              {notification.days.map((day) => (
+                                <Chip
+                                  key={day}
+                                  label={day}
+                                  variant="outlined"
+                                  sx={{ mr: 0.5, mb: 0.5 }}
+                                />
+                              ))}
+                            </Box>
+                          )}
                       </TableCell>
                       <TableCell align="left">
                         {notification.receivers.map((email) => (
@@ -311,13 +327,25 @@ export default function NotificationTable({
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDeleteCancel} variant="outlined">
+            <Button
+              onClick={handleDeleteCancel}
+              variant="outlined"
+              sx={{
+                textTransform: "none",
+                backgroundColor: "#f5f5f5",
+                color: "#333",
+                "&:hover": {
+                  backgroundColor: "#ddd",
+                },
+              }}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleDeleteConfirm}
               variant="contained"
               sx={{
+                textTransform: "none",
                 backgroundColor: "#FF0000", // Cor de fundo vermelha
                 color: "#FFFFFF", // Cor do texto branca
                 "&:hover": {
