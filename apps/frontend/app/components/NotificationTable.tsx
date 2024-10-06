@@ -18,15 +18,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText,
-  Chip,
-  Autocomplete,
   Alert,
+  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -35,6 +28,7 @@ import {
   deleteNotification,
   editNotification,
 } from "../../api/notifications";
+import EditNotificationModal from "./EditNotificationModal";
 import { z } from "zod";
 
 interface Notification {
@@ -43,6 +37,7 @@ interface Notification {
   relevancyScore: number;
   frequency: string;
   receivers: string[];
+  days?: string[];
 }
 
 interface NotificationTableProps {
@@ -63,7 +58,10 @@ export default function NotificationTable({
   const [confirmDelete, setConfirmDelete] = useState<{
     open: boolean;
     id: string | null;
-  }>({ open: false, id: null });
+  }>({
+    open: false,
+    id: null,
+  });
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [currentNotification, setCurrentNotification] =
     useState<Notification | null>(null);
@@ -84,6 +82,7 @@ export default function NotificationTable({
       .min(1)
       .max(5, "Relevancy score must be between 1 and 5"),
     frequency: z.enum(["Daily", "Weekly", "Monthly"]),
+    days: z.array(z.string()).optional(),
   });
 
   useEffect(() => {
@@ -100,11 +99,7 @@ export default function NotificationTable({
         }));
         setNotifications(normalizedData);
       } catch (err: any) {
-        if (err.message) {
-          setError(err.message);
-        } else {
-          setError("Failed to fetch notifications.");
-        }
+        setError(err.message || "Failed to fetch notifications.");
       } finally {
         setLoading(false);
       }
@@ -130,9 +125,7 @@ export default function NotificationTable({
         setConfirmDelete({ open: false, id: null });
         onRefresh();
       } catch (error) {
-        console.error("Error deleting notification:", error);
         setError("Failed to delete notification.");
-        setConfirmDelete({ open: false, id: null });
       }
     }
   };
@@ -157,11 +150,11 @@ export default function NotificationTable({
     setEditErrors({});
   };
 
-  const handleEditSave = async () => {
+  const handleEditSave = async (updatedNotification: Notification) => {
     if (!currentNotification) return;
 
     try {
-      const validatedData = notificationSchema.parse(currentNotification);
+      const validatedData = notificationSchema.parse(updatedNotification);
       setEditErrors({});
       setEditLoading(true);
 
@@ -207,8 +200,7 @@ export default function NotificationTable({
             alignItems="center"
             minHeight="200px"
           >
-            <Alert severity="error">{error}</Alert>{" "}
-            {/* Display general error */}
+            <Alert severity="error">{error}</Alert>
           </Box>
         ) : notifications.length === 0 ? (
           <Box
@@ -242,17 +234,15 @@ export default function NotificationTable({
                         {(page - 1) * rowsPerPage + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        {(Array.isArray(notification.searchQuery)
-                          ? notification.searchQuery
-                          : [notification.searchQuery]
-                        ).map((query: string) => (
-                          <Chip
-                            key={query}
-                            label={query}
-                            variant="outlined"
-                            sx={{ mr: 0.5, mb: 0.5 }}
-                          />
-                        ))}
+                        {Array.isArray(notification.searchQuery) &&
+                          notification.searchQuery.map((query: string) => (
+                            <Chip
+                              key={query}
+                              label={query}
+                              variant="outlined"
+                              sx={{ mr: 0.5, mb: 0.5 }}
+                            />
+                          ))}
                       </TableCell>
                       <TableCell align="left">
                         {notification.relevancyScore}
@@ -327,7 +317,13 @@ export default function NotificationTable({
             <Button
               onClick={handleDeleteConfirm}
               variant="contained"
-              color="secondary"
+              sx={{
+                backgroundColor: "#FF0000", // Cor de fundo vermelha
+                color: "#FFFFFF", // Cor do texto branca
+                "&:hover": {
+                  backgroundColor: "#CC0000", // Cor mais escura ao passar o mouse
+                },
+              }}
             >
               Delete
             </Button>
@@ -336,147 +332,14 @@ export default function NotificationTable({
 
         {/* Edit Notification Dialog */}
         {currentNotification && (
-          <Dialog
+          <EditNotificationModal
             open={editDialogOpen}
+            notification={currentNotification}
             onClose={handleEditClose}
-            maxWidth="sm"
-            fullWidth
-          >
-            <DialogTitle>Edit Notification</DialogTitle>
-            <DialogContent>
-              {/* Form Fields */}
-              <Box sx={{ mt: 2 }}>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={
-                    Array.isArray(currentNotification.searchQuery)
-                      ? currentNotification.searchQuery
-                      : [currentNotification.searchQuery]
-                  }
-                  onChange={(event, newValue) => {
-                    setCurrentNotification({
-                      ...currentNotification,
-                      searchQuery: newValue as string[],
-                    });
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        variant="outlined"
-                        label={option}
-                        {...getTagProps({ index })}
-                      />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Search Queries"
-                      placeholder="Type and press enter"
-                      error={!!editErrors.searchQuery}
-                      helperText={
-                        editErrors.searchQuery || "Enter search queries"
-                      }
-                    />
-                  )}
-                  sx={{ marginBottom: "1rem" }}
-                />
-                <TextField
-                  fullWidth
-                  label="Relevancy Score (1-5)"
-                  type="number"
-                  variant="outlined"
-                  value={currentNotification.relevancyScore}
-                  onChange={(e) =>
-                    setCurrentNotification({
-                      ...currentNotification,
-                      relevancyScore: Number(e.target.value),
-                    })
-                  }
-                  InputProps={{ inputProps: { min: 1, max: 5, step: 1 } }}
-                  error={!!editErrors.relevancyScore}
-                  helperText={editErrors.relevancyScore}
-                  sx={{ marginBottom: "1rem" }}
-                />
-                <FormControl
-                  fullWidth
-                  error={!!editErrors.frequency}
-                  sx={{ marginBottom: "1rem" }}
-                >
-                  <InputLabel>Frequency</InputLabel>
-                  <Select
-                    value={currentNotification.frequency}
-                    onChange={(e) =>
-                      setCurrentNotification({
-                        ...currentNotification,
-                        frequency: e.target.value as
-                          | "Daily"
-                          | "Weekly"
-                          | "Monthly",
-                      })
-                    }
-                    label="Frequency"
-                  >
-                    <MenuItem value="Daily">Daily</MenuItem>
-                    <MenuItem value="Weekly">Weekly</MenuItem>
-                    <MenuItem value="Monthly">Monthly</MenuItem>
-                  </Select>
-                  {editErrors.frequency && (
-                    <FormHelperText>{editErrors.frequency}</FormHelperText>
-                  )}
-                </FormControl>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={currentNotification.receivers}
-                  onChange={(event, newValue) => {
-                    setCurrentNotification({
-                      ...currentNotification,
-                      receivers: newValue as string[],
-                    });
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        variant="outlined"
-                        label={option}
-                        {...getTagProps({ index })}
-                      />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Email Receivers"
-                      placeholder="Type and press enter"
-                      error={!!editErrors.receivers}
-                      helperText={
-                        editErrors.receivers || "Enter email addresses"
-                      }
-                    />
-                  )}
-                />
-              </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleEditClose} variant="outlined">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleEditSave}
-                variant="contained"
-                color="primary"
-                disabled={editLoading}
-              >
-                {editLoading ? <CircularProgress size={24} /> : "Save"}
-              </Button>
-            </DialogActions>
-          </Dialog>
+            onSave={handleEditSave}
+            loading={editLoading}
+            errors={editErrors}
+          />
         )}
       </TableContainer>
     </>

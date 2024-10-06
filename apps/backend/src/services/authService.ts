@@ -64,7 +64,6 @@ export const sendPasswordResetEmail = async (email: string) => {
 
 export const resetUserPassword = async (token: string, newPassword: string) => {
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-  console.log("passo2");
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,

@@ -1,8 +1,13 @@
 import { Router } from "express";
-import { verifyUserEmail } from "../controllers/userController";
+import {
+  resendVerificationUserEmail,
+  verifyUserEmail,
+} from "../controllers/userController";
 
 const router = Router();
 
 router.get("/verify-email/:userId", verifyUserEmail);
+
+router.post("/resend-verification", resendVerificationUserEmail);
 
 export default router;

@@ -387,13 +387,35 @@ export default function NotificationCard({
           paddingBottom: "1rem",
         }}
       >
-        <Button onClick={handleClose} variant="outlined" disabled={loading}>
+        <Button
+          onClick={handleClose}
+          variant="outlined"
+          fullWidth
+          sx={{
+            textTransform: "none",
+            backgroundColor: "#f5f5f5",
+            color: "#333",
+            "&:hover": {
+              backgroundColor: "#ddd",
+            },
+            marginRight: "1rem",
+          }}
+          disabled={loading}
+        >
           Cancel
         </Button>
         <Button
           onClick={handleCreate}
           variant="contained"
-          color="primary"
+          fullWidth
+          sx={{
+            textTransform: "none",
+            backgroundColor: "#333",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#555",
+            },
+          }}
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : "Create"}

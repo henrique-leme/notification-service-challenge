@@ -103,15 +103,6 @@ export default function ClientLayout({
                 </IconButton>
               ) : (
                 <Box sx={{ display: "flex" }}>
-                  {menuItems.map((item) => (
-                    <Button
-                      key={item.text}
-                      onClick={() => router.push(item.path)}
-                      sx={{ color: "#fff" }}
-                    >
-                      {item.text}
-                    </Button>
-                  ))}
                   <Button onClick={handleLogout} sx={{ color: "#fff" }}>
                     Logout
                   </Button>

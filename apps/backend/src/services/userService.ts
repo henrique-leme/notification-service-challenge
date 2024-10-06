@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel";
 import { config } from "../config/index";
 import { generateToken } from "../utils/generateToken";
+import { sendVerificationEmail } from "./emailService";
 
 export const verifyEmail = async (token: string): Promise<string> => {
   try {
@@ -19,7 +20,6 @@ export const verifyEmail = async (token: string): Promise<string> => {
     await user.save();
 
     const authToken = generateToken(user.id.toString());
-    console.log(authToken);
 
     return authToken;
   } catch (error) {
@@ -33,4 +33,15 @@ export const verifyEmail = async (token: string): Promise<string> => {
     }
     throw new Error("Error verifying the token.");
   }
+};
+
+export const resendVerificationEmail = async (email: string) => {
+  const user = await User.findOne({ email: email });
+  if (!user) throw new Error("This email does not exist.");
+
+  if (user.isVerified) throw new Error("This account is already verified.");
+
+  await sendVerificationEmail(user.email, user._id.toString());
+
+  return { message: "Verification email has been resent." };
 };

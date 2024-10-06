@@ -19,7 +19,7 @@ export default function AccountNotVerifiedModal({
   onResendVerification,
 }: AccountNotVerifiedModalProps) {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>Account Not Verified</DialogTitle>
       <DialogContent>
         <Typography>
@@ -27,11 +27,37 @@ export default function AccountNotVerifiedModal({
           your account.
         </Typography>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onResendVerification} color="primary">
+      <DialogActions sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Button
+          onClick={onResendVerification}
+          variant="contained"
+          fullWidth
+          size="large"
+          sx={{
+            backgroundColor: "#333",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#555",
+            },
+            textTransform: "none",
+          }}
+        >
           Resend Verification Email
         </Button>
-        <Button onClick={onClose} color="secondary">
+        <Button
+          onClick={onClose}
+          variant="contained"
+          fullWidth
+          size="large"
+          sx={{
+            backgroundColor: "#555",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#777",
+            },
+            textTransform: "none",
+          }}
+        >
           Close
         </Button>
       </DialogActions>

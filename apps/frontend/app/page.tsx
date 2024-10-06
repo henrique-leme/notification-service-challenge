@@ -39,7 +39,15 @@ export default function DashboardPage() {
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 4 }}>
-      <Paper elevation={3} sx={{ padding: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          padding: { xs: 2, sm: 3 },
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+        }}
+      >
         {loadingToken ? (
           <Box
             display="flex"
@@ -56,13 +64,26 @@ export default function DashboardPage() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                flexDirection: { xs: "column", sm: "row" },
                 mb: 2,
+                gap: 2,
               }}
             >
               <Typography variant="h5" component="h1">
                 Notifications
               </Typography>
-              <Button variant="contained" onClick={handleOpenCreateDialog}>
+              <Button
+                variant="contained"
+                onClick={handleOpenCreateDialog}
+                sx={{
+                  backgroundColor: "#333",
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "#555",
+                  },
+                  textTransform: "none",
+                }}
+              >
                 Create Notification
               </Button>
             </Box>
@@ -82,7 +103,7 @@ export default function DashboardPage() {
           </>
         ) : (
           <Typography color="error">
-            Token não encontrado. Por favor, faça login novamente.
+            Token not found. Please log in again.
           </Typography>
         )}
       </Paper>

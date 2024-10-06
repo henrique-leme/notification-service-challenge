@@ -36,7 +36,7 @@ export const sendPasswordRecoveryEmail = async (email: string) => {
 
 export const resendVerificationEmail = async (email: string) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/resend-verification`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/resend-verification`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -47,7 +47,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
   const { password } = req.body;
-  console.log("passo");
 
   try {
     await resetUserPassword(token, password);
