@@ -24,17 +24,22 @@ export default function RecoveryPasswordPage() {
 
   const handleRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!email) {
       setError("Please fill in the email field");
       return;
     }
 
     try {
-      await sendPasswordRecoveryEmail(email);
-      setSuccess("Recovery email sent successfully");
-      setError("");
-    } catch (err) {
-      setError((err as Error).message);
+      const response = await sendPasswordRecoveryEmail(email);
+
+      if (response.message) {
+        setSuccess(response.message);
+        setError("");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to send recovery email");
+      setSuccess("");
     }
   };
 
@@ -77,16 +82,21 @@ export default function RecoveryPasswordPage() {
         >
           Recover Password
         </Typography>
+
+        {/* Exibe a mensagem de erro */}
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
+
+        {/* Exibe a mensagem de sucesso */}
         {success && (
           <Alert severity="success" sx={{ mb: 2 }}>
             {success}
           </Alert>
         )}
+
         <Box component="form" onSubmit={handleRecovery} sx={{ mt: 2 }}>
           <TextField
             fullWidth

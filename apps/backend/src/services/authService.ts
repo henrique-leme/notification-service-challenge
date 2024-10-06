@@ -9,7 +9,7 @@ import crypto from "crypto";
 import { config } from "../config/index";
 
 export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email });
   if (!user) throw new Error("Incorrect email or password.");
 
   const isMatch = await comparePassword(password, user.password);
@@ -19,7 +19,7 @@ export const loginUser = async (email: string, password: string) => {
     throw new Error("Please verify your email to continue.");
 
   return jwt.sign({ id: user._id.toString() }, config.JWT_SECRET || "", {
-    expiresIn: "30d",
+    expiresIn: "30m",
   });
 };
 
@@ -29,9 +29,8 @@ export const registerUser = async (
   email: string,
   password: string
 ) => {
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ email: email });
   if (userExists) throw new Error("Email is already registered.");
-
   const hashedPassword = await hashPassword(password);
 
   const newUser = new User({
@@ -47,7 +46,7 @@ export const registerUser = async (
 };
 
 export const sendPasswordResetEmail = async (email: string) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email });
   if (!user) {
     return;
   }

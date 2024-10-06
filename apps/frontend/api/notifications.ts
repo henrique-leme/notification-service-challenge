@@ -78,6 +78,7 @@ export const deleteNotification = async (
   );
 
   if (!response.ok) {
-    throw new Error("Failed to delete notification");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete notification");
   }
 };

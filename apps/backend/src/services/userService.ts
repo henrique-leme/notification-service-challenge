@@ -18,7 +18,9 @@ export const verifyEmail = async (token: string): Promise<string> => {
     user.isVerified = true;
     await user.save();
 
-    const authToken = generateToken(user._id.toString());
+    const authToken = generateToken(user.id.toString());
+    console.log(authToken);
+
     return authToken;
   } catch (error) {
     if (error instanceof Error && error.name === "TokenExpiredError") {

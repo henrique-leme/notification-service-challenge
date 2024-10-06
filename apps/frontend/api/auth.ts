@@ -9,8 +9,8 @@ export const loginUser = async (email: string, password: string) => {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Failed to login");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to login");
   }
 
   const data = await response.json();
@@ -33,8 +33,8 @@ export const registerUser = async (userData: {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Failed to register");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to register");
   }
 
   const data = await response.json();

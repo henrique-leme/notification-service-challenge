@@ -33,14 +33,13 @@ export const createNotification = async (
   user.notificationList.push(newNotification._id as mongoose.Types.ObjectId);
   await user.save();
 
-  const candidateName = username?.get("name");
-  const emailContent = `Hello!
+  const userName = username?.get("name");
+  const emailContent = `Hello ${userName}!
 
-This is ${candidateName}. You've requested notifications about "${searchQuery}".
-With Frequency: ${frequency}, Timezone: ${timezone}.
-Have a great day,
+This is Henry. You've requested notifications about "${searchQuery}".
+With Frequency: ${frequency}.
 
-${candidateName}`;
+Have a great day ${userName}`;
 
   try {
     await sendNotificationEmail(receivers, emailContent);

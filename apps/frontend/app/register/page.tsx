@@ -64,7 +64,7 @@ export default function RegistrationPage() {
       });
 
       setOpenModal(true);
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
         err.errors.forEach((error) => {
@@ -74,7 +74,7 @@ export default function RegistrationPage() {
         });
         setErrors(fieldErrors);
       } else {
-        setErrors({ general: "Error registering user" });
+        setErrors({ general: err.message || "Error registering user" });
       }
     }
   };

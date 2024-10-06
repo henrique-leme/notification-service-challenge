@@ -28,9 +28,10 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       const data = await loginUser(email, password);
+
       localStorage.setItem("token", data.token);
       router.push("/");
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof Error) {
         setError(err.message);
       } else {

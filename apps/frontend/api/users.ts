@@ -9,8 +9,8 @@ export const sendVerificationEmail = async (email: string, userId: string) => {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Failed to send verification email");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to send verification email");
   }
 };
 
@@ -25,9 +25,13 @@ export const sendPasswordRecoveryEmail = async (email: string) => {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Failed to send password recovery email");
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message || "Failed to send password recovery email"
+    );
   }
+
+  return await response.json();
 };
 
 export const resendVerificationEmail = async (email: string) => {
@@ -41,7 +45,7 @@ export const resendVerificationEmail = async (email: string) => {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Failed to resend verification email");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to resend verification email");
   }
 };

@@ -22,6 +22,10 @@ import {
 import { useState } from "react";
 import { z } from "zod";
 import { createNotification } from "../../api/notifications";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
 
 interface NotificationCardProps {
   open: boolean;
@@ -149,11 +153,13 @@ export default function NotificationCard({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle className="text-center text-xl font-semibold">
+      <DialogTitle
+        style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: "bold" }}
+      >
         Manage Bid Notifications
       </DialogTitle>
       <DialogContent>
-        <p className="text-center mb-4 text-gray-500">
+        <p style={{ textAlign: "center", marginBottom: "1rem", color: "#666" }}>
           Configure your email notification settings for relevant business bids.
         </p>
         {errors.apiError && (
@@ -161,7 +167,7 @@ export default function NotificationCard({
             {errors.apiError}
           </Box>
         )}
-        <Box className="p-4">
+        <Box style={{ padding: "1rem" }}>
           <Grid container spacing={3}>
             {/* Frequency */}
             <Grid item xs={12} sm={6}>
@@ -182,9 +188,6 @@ export default function NotificationCard({
                   }
                   label="Notification Frequency"
                 >
-                  <MenuItem value="" disabled>
-                    Select frequency
-                  </MenuItem>
                   <MenuItem value="Daily">Daily</MenuItem>
                   <MenuItem value="Weekly">Weekly</MenuItem>
                   <MenuItem value="Monthly">Monthly</MenuItem>
@@ -197,26 +200,26 @@ export default function NotificationCard({
 
             {/* Time */}
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Notification Time"
-                type="time"
-                value={newNotification.time}
-                onChange={(e) =>
-                  setNewNotification({
-                    ...newNotification,
-                    time: e.target.value,
-                  })
-                }
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  step: 300, // 5 min
-                }}
-                error={!!errors.time}
-                helperText={errors.time}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                  label="Notification Time"
+                  value={
+                    newNotification.time
+                      ? dayjs(`1970-01-01T${newNotification.time}`)
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    const timeString = newValue
+                      ? dayjs(newValue).format("HH:mm")
+                      : "";
+                    setNewNotification({
+                      ...newNotification,
+                      time: timeString,
+                    });
+                  }}
+                  ampm={true}
+                />
+              </LocalizationProvider>
             </Grid>
 
             {/* Timezone */}
@@ -233,9 +236,6 @@ export default function NotificationCard({
                   }
                   label="Timezone"
                 >
-                  <MenuItem value="" disabled>
-                    Select timezone
-                  </MenuItem>
                   {timezones.map((tz) => (
                     <MenuItem key={tz} value={tz}>
                       {tz}
@@ -380,7 +380,13 @@ export default function NotificationCard({
           </Grid>
         </Box>
       </DialogContent>
-      <DialogActions className="px-6 pb-4">
+      <DialogActions
+        style={{
+          paddingLeft: "1.5rem",
+          paddingRight: "1.5rem",
+          paddingBottom: "1rem",
+        }}
+      >
         <Button onClick={handleClose} variant="outlined" disabled={loading}>
           Cancel
         </Button>
